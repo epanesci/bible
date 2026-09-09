@@ -4,15 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Biblia por Temas</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
     <style>
       body { margin: 0; }
+      #root:empty::before {
+        content: "Cargando...";
+        display: block;
+        padding: 40px;
+        font-family: sans-serif;
+        color: #666;
+      }
+      #load-error {
+        display: none;
+        padding: 24px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        color: #b00020;
+        background: #fff3f3;
+        border: 1px solid #b00020;
+        margin: 16px;
+        border-radius: 8px;
+      }
     </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="load-error"></div>
+    <script>
+      window.addEventListener("error", function (e) {
+        var box = document.getElementById("load-error");
+        if (box) {
+          box.style.display = "block";
+          box.textContent = "Error al cargar la app:\n" + (e.message || e.error || "desconocido") +
+            (e.filename ? ("\nArchivo: " + e.filename + ":" + e.lineno) : "");
+        }
+      });
+    </script>
     <script type="text/babel" data-presets="react">
 const { useState, useMemo } = React;
 
@@ -1581,8 +1610,15 @@ function BibliaPorTemas() {
 }
 
 
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<BibliaPorTemas />);
+      const rootEl = document.getElementById("root");
+      if (window.React && window.ReactDOM && rootEl) {
+        const root = ReactDOM.createRoot(rootEl);
+        root.render(<BibliaPorTemas />);
+      } else {
+        document.getElementById("load-error").style.display = "block";
+        document.getElementById("load-error").textContent =
+          "No se pudieron cargar React/ReactDOM desde el CDN. Revisá tu conexión a internet.";
+      }
     </script>
   </body>
 </html>
