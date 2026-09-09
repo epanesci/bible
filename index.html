@@ -57,7 +57,7 @@
       });
     </script>
     <script type="text/babel" data-presets="react">
-const { useState, useMemo } = React;
+const { useState, useMemo, useRef } = React;
 
 const CHAPTERS_ES = [
   {
@@ -1269,9 +1269,14 @@ function BibliaPorTemas() {
   const chapters = lang === "en" ? CHAPTERS_EN : CHAPTERS_ES;
   const t = UI[lang];
   const [activeChapter, setActiveChapter] = useState(CHAPTERS_ES[0].id);
+  const chapterTopRef = useRef(null);
   const goToChapter = (id) => {
     setActiveChapter(id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      if (chapterTopRef.current) {
+        chapterTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 0);
   };
   const [query, setQuery] = useState("");
 
@@ -1463,7 +1468,7 @@ function BibliaPorTemas() {
             )}
           </div>
         ) : (
-          <div style={{ position: "relative" }}>
+          <div ref={chapterTopRef} style={{ position: "relative" }}>
             <div
               style={{
                 position: "absolute",
